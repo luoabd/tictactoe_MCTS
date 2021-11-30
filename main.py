@@ -4,7 +4,7 @@
 
 # packages
 from copy import deepcopy
-
+import random
 # Tic Tac Toe board class
 
 
@@ -34,7 +34,7 @@ class Board():
             for col in range(3):
                 # set every board square to empty square
                 self.position[row, col] = self.empty_square
-    # TODO: Should this be toggled by an option? Or make a completely seperate file for the TAs?
+    # NOTE: Should this be toggled by an option? Or make a completely seperate file for the TAs?
     # Initialize a limited board similar to the one in the assignment
     # def init_board(self):
     #     self.position[0, 0] = self.empty_square
@@ -166,10 +166,11 @@ class Board():
         return False
 
     # generate legal moves to play in the current position
+    # NOTE: actions are not used currently but I left them in case we need them later
     def generate_states(self):
         # define states list (move list - list of available actions to consider)
         actions = []
-
+        empty_tiles = []
         # loop over board rows
         for row in range(3):
             # loop over board columns
@@ -178,9 +179,10 @@ class Board():
                 if self.position[row, col] == self.empty_square:
                     # append available action/board state to action list
                     actions.append(self.make_move(row, col))
+                    empty_tiles.append((row, col))
 
         # return the list of available actions (board class instances)
-        return actions
+        return actions, empty_tiles
 
     # main game loop
     def game_loop(self):
@@ -217,7 +219,23 @@ class Board():
                 # make move on board
                 self = self.make_move(row, col)
 
-                # make AI move here...
+                # print board
+                print(self)
+
+                # check if the game is won
+                if self.is_win():
+                    print('player "%s" has won the game!\n' % self.player_2)
+                    break
+
+                # check if the game is drawn
+                elif self.is_draw():
+                    print('Game is drawn!\n')
+                    break
+
+                # 2nd player phase
+                a, empty_tiles = self.generate_states()
+                rand_move_row, rand_move_col = random.choice(empty_tiles)
+                self = self.make_move(rand_move_row, rand_move_col)
 
                 # print board
                 print(self)
