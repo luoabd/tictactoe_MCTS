@@ -1,8 +1,6 @@
-#
-# AI that learns to play Tic Tac Toe using
-#        reinforcement learning
-#                (MCTS)
-#
+# Originally written By Code Monkey King
+# Source: https://github.com/maksimKorzh/tictactoe-mtcs/tree/master/src/tutorials/game_loop
+# Edited by Abdellah Lahnaoui and Ben Platten from group 24
 
 # packages
 from copy import deepcopy

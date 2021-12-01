@@ -1,3 +1,6 @@
+# Originally written By Code Monkey King
+# Source: https://github.com/maksimKorzh/tictactoe-mtcs/tree/master/src/tutorials/game_loop
+# Edited by Abdellah Lahnaoui and Ben Platten from group 24
 #
 # MCTS algorithm implementation
 #
