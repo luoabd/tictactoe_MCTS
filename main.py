@@ -35,6 +35,19 @@ class Board():
             for col in range(3):
                 # set every board square to empty square
                 self.position[row, col] = self.empty_square
+    # Initialize a limited board similar to the one in the assignment
+    def restrict_board(self):
+        self.position[0, 0] = self.empty_square
+        self.position[0, 1] = self.player_2
+        self.position[0, 2] = self.empty_square
+
+        self.position[1, 0] = self.player_1
+        self.position[1, 1] = self.player_1
+        self.position[1, 2] = self.player_2
+
+        for i in range(3):
+            self.position[2, i] = self.empty_square
+
     
     # make move
     def make_move(self, row, col):
