@@ -46,7 +46,7 @@ class MCTS():
         self.root = TreeNode(initial_state, None)
 
         # walk through 1000 iterations
-        for iteration in range(10):
+        for iteration in range(1000):
             # select a node (selection phase)
             node = self.select(self.root)
             
@@ -75,10 +75,10 @@ class MCTS():
             else:
                 # otherwise expand the node
                 return self.expand(node)
-                
-        # return node 
+       
+        # return node
         return node
-
+    
     # expand node
     def expand(self, node):
         # generate legal states (moves) for the given node
@@ -102,8 +102,7 @@ class MCTS():
                 return new_node
         
         # debugging
-        print('Should not get here!!!') 
-    
+        print('Should not get here!!!')
     
     # simulate the game via making random moves until reach end of the game
     def rollout(self, board):
@@ -122,8 +121,7 @@ class MCTS():
         # return score from the player "x" perspective
         if board.player_2 == 'x': return 1
         elif board.player_2 == 'o': return -1
-    
-
+                
     # backpropagate the number of visits and score up to the root node
     def backpropagate(self, node, score):
         # update nodes's up to root node
@@ -131,11 +129,11 @@ class MCTS():
             # update node's visits
             node.visits += 1
             
-            # update node's score // should this replace score rather than add to it?
+            # update node's score
             node.score += score
             
             # set node to parent
-            node = node.parent     
+            node = node.parent
     
     # select the best node basing on UCB1 formula
     def get_best_move(self, node, exploration_constant):
@@ -151,7 +149,7 @@ class MCTS():
             
             # get move score using UCT formula
             move_score = current_player * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))                                        
-            print('move_score:', move_score)
+
             # better move has been found
             if move_score > best_score:
                 best_score = move_score
