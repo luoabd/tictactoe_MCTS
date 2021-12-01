@@ -7,6 +7,9 @@ print("Starting the simulation")
 
 # how many games should play
 NUM_SIM = 100
+# Choose whther player 2 plays optimally or randomly
+# True: optimal, False: random
+player2_optimal = True
 
 # Choose initial move you want:
 possible_steps = [[0, 0], [0, 2], [2, 0], [2, 1], [2, 2]]
@@ -29,12 +32,19 @@ for possible_step in possible_steps:
         f"Calculating the probability of victory for action: {possible_step}")
     while count < NUM_SIM:
         if first_step == 0:
-            # Rand player
-            try:
-                random_move = random.choice(board.generate_states())
-                board = random_move
-            except:
-                pass
+            if player2_optimal:
+                try:
+                    best_move = mcts.search(board)
+                    board = best_move.board
+                except:
+                    pass
+            else:
+                # Rand player
+                try:
+                    random_move = random.choice(board.generate_states())
+                    board = random_move
+                except:
+                    pass
 
             # AI player
             try:
