@@ -6,7 +6,6 @@
 
 # packages
 from copy import deepcopy
-import random
 from mcts import *
 
 # Tic Tac Toe board class
@@ -29,28 +28,14 @@ class Board():
             self.__dict__ = deepcopy(board.__dict__)
     
     # init (reset) board
-"""     def init_board(self):
+    def init_board(self):
         # loop over board rows
         for row in range(3):
             # loop over board columns
             for col in range(3):
                 # set every board square to empty square
-                self.position[row, col] = self.empty_square """
+                self.position[row, col] = self.empty_square
     
-    # NOTE: Should this be toggled by an option? Or make a completely seperate file for the TAs?
-    # Initialize a limited board similar to the one in the assignment
-    def init_board(self):
-         self.position[0, 0] = self.empty_square
-         self.position[0, 1] = self.player_2
-         self.position[0, 2] = self.empty_square
-
-         self.position[1, 0] = self.player_1
-         self.position[1, 1] = self.player_1
-         self.position[1, 2] = self.player_2
-
-    #     for i in range(3):
-    #         self.position[2, i] = self.empty_square
-
     # make move
     def make_move(self, row, col):
         # create new board instance that inherits from the current state
@@ -169,7 +154,6 @@ class Board():
         return False
     
     # generate legal moves to play in the current position
-    # NOTE: actions are not used currently but I left them in case we need them later
     def generate_states(self):
         # define states list (move list - list of available actions to consider)
         actions = []
@@ -188,12 +172,15 @@ class Board():
     
     # main game loop
     def game_loop(self):
-        print('\n  Tic Tac Toe with Monte Carlo Tree Search\n')
+        print('\n  Tic Tac Toe by Code Monkey King\n')
         print('  Type "exit" to quit the game')
         print('  Move format [x,y]: 1,2 where 1 is column and 2 is row')
         
         # print board
         print(self)
+        
+        # create MCTS instance
+        mcts = MCTS()
                 
         # game loop
         while True:
@@ -206,20 +193,32 @@ class Board():
             # skip empty input
             if user_input == '': continue
             
-            try:
-                # parse user input (move format [col, row]: 1,2) 
-                row = int(user_input.split(',')[1]) - 1
-                col = int(user_input.split(',')[0]) - 1
-
-                # check move legality
-                if self.position[row, col] != self.empty_square:
-                    print(' Illegal move!')
-                    continue
-
-                # make move on board
-                self = self.make_move(row, col)
+            try:                
+                # search for the best move
+                best_move = mcts.search(self)
+                try:
+                    # make AI move here
+                    self = best_move.board
+                    print("AI_move!")
                 
-                # make AI move here...
+                # game over
+                except:
+                    pass
+                
+                # print board
+                print(self)
+
+                # random move
+                random_move = random.choice(self.generate_states())
+
+                if self.is_win() == False and self.is_draw() == False:
+
+                    try:
+                        self = random_move
+                        print("random_move!")
+                    # game over
+                    except:
+                        pass
                 
                 # print board
                 print(self)
@@ -269,22 +268,5 @@ if __name__ == '__main__':
     board = Board()
     
     # start game loop
-    #board.game_loop()
-    
-    # create MCTS instance
-    mcts = MCTS()
-    
-    # AI vs AI
-    while True:
-        # find best move
-        best_move = mcts.search(board)
-
-        # make the best move
-        board = best_move.board
-
-        # print board
-        print(board)
-
-        input()
-    
-    
+    board.game_loop()
+        
