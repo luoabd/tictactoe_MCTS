@@ -188,7 +188,7 @@ class Board():
     # main game loop
     def game_loop(self):
         print('\n  Tic Tac Toe by Code Monkey King\n')
-        print('\n  Choose 1 for random player or Choose 2 for optimal player\n')
+        print('\n  Choose 1 for random player or Choose 2 for optimal player (minimax) or Choose 3 for optimal player (UCT)\n')
         player2_optimal = input()
         print(player2_optimal)
         # print board
@@ -218,13 +218,21 @@ class Board():
 
                 if self.is_win() == False and self.is_draw() == False:
 
-                    if player2_optimal == '2':
+                    if player2_optimal == '3':
                         try:
                             best_move = mcts.tree_search(self)
                             self = best_move.board
                             print("player2_moved!")
                         except:
                             pass
+                    elif player2_optimal == '2':
+                        try:
+                            best_move = mcts.tree_search(self, minimax=True)
+                            self = best_move.board
+                            print("player2_moved!")
+                        except:
+                            pass
+
                     elif player2_optimal == '1':
                         # Rand player
                         try:

@@ -48,7 +48,7 @@ class TreeNode():
 
 class MCTS():
     # combine steps of algorithm
-    def tree_search(self, initial_state):
+    def tree_search(self, initial_state, minimax=False):
         # initialise tree
         self.root = TreeNode(initial_state, None)
 
@@ -62,7 +62,7 @@ class MCTS():
             score = self.rollout(node.board)
 
             # backpropagate step to update nodes
-            self.backpropagate(node, score)
+            self.backpropagate(node, score, minimax)
 
         # make a move
         try:
