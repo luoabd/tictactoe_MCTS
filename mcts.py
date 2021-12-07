@@ -37,7 +37,9 @@ class TreeNode():
         
         # init the total score of the node
         self.score = 0
-        
+        self.wins = 0
+        self.ties = 0
+        self.losses = 0
         # init current node's children
         self.children = {}
 
@@ -54,10 +56,10 @@ class MCTS():
             node = self.select(self.root)
             
             # scrore current node (simulation phase)
-            score = self.rollout(node.board)
+            self.rollout(node.board)
             
             # backpropagate results
-            self.backpropagate(node, score)
+            self.backpropagate(node)
         
         # pick up the best move in the current position
         try:
@@ -126,15 +128,19 @@ class MCTS():
         elif board.player_2 == 'o': return -1
                 
     # backpropagate the number of visits and score up to the root node
-    def backpropagate(self, node, score):
+    def backpropagate(self, node):
         # update nodes's up to root node
         while node is not None:
             # update node's visits
             node.visits += 1
-            
-            # update node's score
-            node.score += score
-            
+            if node.is_terminal:
+                if node.board.is_win():
+                    node.wins += 1
+                elif node.board.is_draw():
+                    node.ties += 1
+                else:
+                    node.losses += 1
+
             # set node to parent
             node = node.parent
     
@@ -151,7 +157,7 @@ class MCTS():
             elif child_node.board.player_2 == 'o': current_player = -1
             
             # get move score using UCT formula
-            move_score = current_player * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))                                        
+            move_score = current_player * (child_node.wins - child_node.losses) / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))                                        
 
             # better move has been found
             if move_score > best_score:
