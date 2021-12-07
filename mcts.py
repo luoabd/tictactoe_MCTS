@@ -38,6 +38,9 @@ class TreeNode():
         # init current node's children
         self.children = {}
 
+        # init q
+        self.q = 0
+
 # MCTS class definition
 class MCTS():
     # search for the best move in the current position
@@ -46,9 +49,10 @@ class MCTS():
         self.root = TreeNode(initial_state, None)
 
         # walk through 1000 iterations
-        for iteration in range(1000):
+        for iteration in range(10000):
             # select a node (selection phase)
             node = self.select(self.root)
+            # node = random.choice(self.root.generate_states())
             
             # scrore current node (simulation phase)
             score = self.rollout(node.board)
@@ -70,6 +74,7 @@ class MCTS():
             # case where the node is fully expanded
             if node.is_fully_expanded:
                 node = self.get_best_move(node, 2)
+                # node = node.board.generate_states()
             
             # case where the node is not fully expanded 
             else:
@@ -132,6 +137,7 @@ class MCTS():
             # update node's score
             node.score += score
             
+            node.q = node.score / node.visits
             # set node to parent
             node = node.parent
     
@@ -148,7 +154,8 @@ class MCTS():
             elif child_node.board.player_2 == 'o': current_player = -1
             
             # get move score using UCT formula
-            move_score = current_player * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))                                        
+            # move_score = current_player * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))
+            move_score = node.q
 
             # better move has been found
             if move_score > best_score:
@@ -156,8 +163,14 @@ class MCTS():
                 best_moves = [child_node]
             
             # found as good move as already available
-            elif move_score == best_score:
-                best_moves.append(child_node)
-            
+            # elif move_score == best_score:
+            #     best_moves.append(child_node)
+            #     best_scores.append(best_score)
+        # FOR DEBUGGING
+        # print('\n----------------------')
+        # print(f'\n [-] best_action:{best_moves}')
+        # print(f' best_q = {best_score}')
+    
         # return one of the best moves randomly
+        # print(best_scores)
         return random.choice(best_moves)

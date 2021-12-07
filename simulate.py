@@ -9,7 +9,7 @@ print("Starting the simulation")
 NUM_SIM = 100
 # Choose whther player 2 plays optimally or randomly
 # True: optimal, False: random
-player2_optimal = True
+player2_optimal = False
 
 # Choose initial move you want:
 possible_steps = [[0, 0], [0, 2], [2, 0], [2, 1], [2, 2]]
