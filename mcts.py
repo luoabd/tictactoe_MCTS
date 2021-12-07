@@ -40,7 +40,6 @@ class TreeNode():
 
         # init the total score of the node
         self.score = 0
-
         # init current node's children
         self.children = {}
 
