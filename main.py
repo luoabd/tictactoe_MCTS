@@ -1,8 +1,6 @@
-#
-# AI that learns to play Tic Tac Toe using
-#        reinforcement learning
-#                (MCTS)
-#
+# Originally written By Code Monkey King
+# Source: https://github.com/maksimKorzh/tictactoe-mtcs/tree/master/src/tutorials/game_loop
+# Edited by Abdellah Lahnaoui and Ben Platten from group 24
 
 # packages
 from copy import deepcopy
@@ -35,6 +33,7 @@ class Board():
             for col in range(3):
                 # set every board square to empty square
                 self.position[row, col] = self.empty_square
+
     # Initialize a limited board similar to the one in the assignment
     def restrict_board(self):
         self.position[0, 0] = self.empty_square
@@ -47,7 +46,6 @@ class Board():
 
         for i in range(3):
             self.position[2, i] = self.empty_square
-
     
     # make move
     def make_move(self, row, col):
