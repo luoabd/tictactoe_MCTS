@@ -8,159 +8,189 @@
 # packages
 import math
 import random
+import pandas as pd
 
 # tree node class definition
+
+
 class TreeNode():
     # class constructor (create tree node class instance)
     def __init__(self, board, parent):
         # init associated board state
         self.board = board
-        
+
         # init is node terminal flag
         if self.board.is_win() or self.board.is_draw():
             # we have a terminal node
             self.is_terminal = True
-        
+
         # otherwise
         else:
             # we have a non-terminal node
             self.is_terminal = False
-        
+
         # init is fully expanded flag
         self.is_fully_expanded = self.is_terminal
-        
+
         # init parent node if available
         self.parent = parent
-        
+
         # init the number of node visits
         self.visits = 0
-        
+
         # init the total score of the node
         self.score = 0
-        
+
         # init current node's children
         self.children = {}
 
-# MCTS class definition
+# MCTS class
+
+
 class MCTS():
-    # search for the best move in the current position
-    def search(self, initial_state):
-        # create root node
+    # combine steps of algorithm
+    def tree_search(self, initial_state):
+        # initialise tree
         self.root = TreeNode(initial_state, None)
 
-        # walk through 1000 iterations
+        # iterations
         for iteration in range(1000):
-            # select a node (selection phase)
-            node = self.select(self.root)
-            
-            # scrore current node (simulation phase)
+            # print(f"iteration:{iteration}")
+            # tree traversal step
+            node = self.tree_traversal(self.root, iteration)
+
+            # simulation step
             score = self.rollout(node.board)
-            
-            # backpropagate results
+
+            # backpropagate step to update nodes
             self.backpropagate(node, score)
-        
-        # pick up the best move in the current position
+
+        # make a move
         try:
             return self.get_best_move(self.root, 0)
-        
+
         except:
             pass
-    
-    # select most promising node
-    def select(self, node):
-        # make sure that we're dealing with non-terminal nodes
+
+    # taking the action that maximises the UCB score
+    def tree_traversal(self, node, iteration=None):
         while not node.is_terminal:
-            # case where the node is fully expanded
             if node.is_fully_expanded:
-                node = self.get_best_move(node, 2)
-            
-            # case where the node is not fully expanded 
+                node = self.get_best_move(node, 2, iteration)
+
+            # if not fully expanded
             else:
-                # otherwise expand the node
                 return self.expand(node)
-       
-        # return node
+
         return node
-    
-    # expand node
+
+    # explore
     def expand(self, node):
         # generate legal states (moves) for the given node
         states = node.board.generate_states()
-        
-        # loop over generated states (moves)
+
         for state in states:
-            # make sure that current state (move) is not present in child nodes
             if str(state.position) not in node.children:
-                # create a new node
+                # create node for new states
                 new_node = TreeNode(state, node)
-                
-                # add child node to parent's node children list (dict)
+
+                # save as child
                 node.children[str(state.position)] = new_node
-                
-                # case when node is fully expanded
+
+                # if fully expanded
                 if len(states) == len(node.children):
                     node.is_fully_expanded = True
-                
-                # return newly created node
+
                 return new_node
-        
-        # debugging
-        print('Should not get here!!!')
-    
-    # simulate the game via making random moves until reach end of the game
+
+    # simulate step
+
     def rollout(self, board):
-        # make random moves for both sides until terminal state of the game is reached
+        # simulate game until end
         while not board.is_win():
-            # try to make a move
             try:
-                # make the on board
+                # random move
                 board = random.choice(board.generate_states())
-                
-            # no moves available
+
             except:
-                # return a draw score
+                # draw
                 return 0
-        
-        # return score from the player "x" perspective
-        if board.player_2 == 'x': return 1
-        elif board.player_2 == 'o': return -1
-                
-    # backpropagate the number of visits and score up to the root node
-    def backpropagate(self, node, score):
-        # update nodes's up to root node
+
+        # score dependent on player
+        if board.player_2 == 'x':
+            return 1
+        elif board.player_2 == 'o':
+            return -1
+
+    # backpropagate step
+    def backpropagate(self, node, score, minimax=False):
         while node is not None:
-            # update node's visits
+            # add visit
             node.visits += 1
-            
-            # update node's score
-            node.score += score
-            
-            # set node to parent
+
+            # update score
+            if minimax == False:
+                node.score += score
+
+            elif minimax == True:
+                if node.board.player_2 == 'x':
+                    node.score += score
+                elif node.board.player_2 == 'o':
+                    node.score += -abs(score)
+
+            # move up tree
             node = node.parent
-    
-    # select the best node basing on UCB1 formula
-    def get_best_move(self, node, exploration_constant):
-        # define best score & best moves
+
+    # apply the UCB formula
+    def get_best_move(self, node, exploration_constant, iteration=None):
+        # function to help label the child nodes
+        def generate_states(child):
+            # define states list (move list - list of available actions to consider)
+            actions = []
+
+            # loop over board rows
+            for col in range(3):
+                # loop over board columns
+                for row in range(3):
+                    # make sure that current square is empty
+                    if child.board.position[col, row] == child.board.empty_square:
+                        # append available action/board state to action list
+                        actions.append((col+1, row+1))
+
+            # return the list of available actions (board class instances)
+            return actions
+
         best_score = float('-inf')
         best_moves = []
-        
-        # loop over child nodes
-        for child_node in node.children.values():
-            # define current player
-            if child_node.board.player_2 == 'x': current_player = 1
-            elif child_node.board.player_2 == 'o': current_player = -1
-            
-            # get move score using UCT formula
-            move_score = current_player * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))                                        
 
-            # better move has been found
+        # df = pd.read_csv("convergence_minimax.csv")
+        # temp = pd.DataFrame(columns=('iteration', 'move', 'score', 'empties'))
+        # for all potential moves
+        for i, child_node in enumerate(node.children.values()):
+            empties = generate_states(child_node)
+            # temp.loc[i] = [iteration, i, child_node.score, str(empties)]
+
+            # score dependent on player
+            if child_node.board.player_2 == 'x':
+                current_player = 1
+            elif child_node.board.player_2 == 'o':
+                current_player = -1
+
+            # UCB
+            move_score = current_player * child_node.score / child_node.visits + \
+                exploration_constant * \
+                math.sqrt(math.log(node.visits / child_node.visits))
+
+            # store best move
             if move_score > best_score:
                 best_score = move_score
                 best_moves = [child_node]
-            
-            # found as good move as already available
+
             elif move_score == best_score:
                 best_moves.append(child_node)
-            
-        # return one of the best moves randomly
+
+        # save scores for plotting policy convergence
+        # df = pd.concat([df, temp])
+        # df.to_csv("convergence_minimax.csv", index=False)
+        # random choice of best move
         return random.choice(best_moves)

@@ -6,10 +6,10 @@ from mcts import *
 print("Starting the simulation")
 
 # how many games should play
-NUM_SIM = 100
+NUM_SIM = 1000
 # Choose whther player 2 plays optimally or randomly
 # True: optimal, False: random
-player2_optimal = True
+player2_optimal = False
 
 # Choose initial move you want:
 possible_steps = [[0, 0], [0, 2], [2, 0], [2, 1], [2, 2]]
@@ -34,7 +34,7 @@ for possible_step in possible_steps:
         if first_step == 0:
             if player2_optimal:
                 try:
-                    best_move = mcts.search(board)
+                    best_move = mcts.tree_search(board)
                     board = best_move.board
                 except:
                     pass
@@ -48,7 +48,7 @@ for possible_step in possible_steps:
 
             # AI player
             try:
-                best_move = mcts.search(board)
+                best_move = mcts.tree_search(board)
                 board = best_move.board
             except:
                 pass

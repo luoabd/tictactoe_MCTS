@@ -6,6 +6,10 @@
 from copy import deepcopy
 from mcts import *
 
+# Choose whther player 2 plays optimally or randomly
+# True: optimal, False: random
+# player2_optimal = True
+
 # Tic Tac Toe board class
 class Board():
     # create constructor (init board class instance)
@@ -184,9 +188,9 @@ class Board():
     # main game loop
     def game_loop(self):
         print('\n  Tic Tac Toe by Code Monkey King\n')
-        print('  Type "exit" to quit the game')
-        print('  Move format [x,y]: 1,2 where 1 is column and 2 is row')
-        
+        print('\n  Choose 1 for random player or Choose 2 for optimal player\n')
+        player2_optimal = input()
+        print(player2_optimal)
         # print board
         print(self)
         
@@ -195,22 +199,13 @@ class Board():
                 
         # game loop
         while True:
-            # get user input
-            user_input = input('> ')
-        
-            # escape condition
-            if user_input == 'exit': break
-            
-            # skip empty input
-            if user_input == '': continue
-            
             try:                
                 # search for the best move
-                best_move = mcts.search(self)
+                best_move = mcts.tree_search(self)
                 try:
                     # make AI move here
                     self = best_move.board
-                    print("AI_move!")
+                    print("player1_moved!")
                 
                 # game over
                 except:
@@ -220,17 +215,25 @@ class Board():
                 print(self)
 
                 # random move
-                random_move = random.choice(self.generate_states())
 
                 if self.is_win() == False and self.is_draw() == False:
 
-                    try:
-                        self = random_move
-                        print("random_move!")
-                    # game over
-                    except:
-                        pass
-                
+                    if player2_optimal == '2':
+                        try:
+                            best_move = mcts.tree_search(self)
+                            self = best_move.board
+                            print("player2_moved!")
+                        except:
+                            pass
+                    elif player2_optimal == '1':
+                        # Rand player
+                        try:
+                            random_move = random.choice(self.generate_states())
+                            self = random_move
+                            print("player2_moved!")
+                        except:
+                            pass
+                        
                 # print board
                 print(self)
                 
@@ -246,8 +249,6 @@ class Board():
             
             except Exception as e:
                 print('  Error:', e)
-                print('  Illegal command!')
-                print('  Move format [x,y]: 1,2 where 1 is column and 2 is row')
         
     # print board state
     def __str__(self):
